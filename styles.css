@@ -1,0 +1,24 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+:root {
+    --color-title: #313140;
+    --color-title-sec: #F2264B;
+    --grey: #B7B7C8;
+
+    font-size: 62.5%;
+}
+body {
+    font-size: 1.6rem
+}
+header {
+    display: flex;
+    justify-content: space-between;
+    width: 120rem;
+    margin: 0 auto;
+}
+header .logo svg {
+    width: 30rem;
+}
