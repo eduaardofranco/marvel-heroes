@@ -1,44 +1,44 @@
 export class MarvelApi {
     static search() {
-        const endPoint = 'http://gateway.marvel.com/v1/public/comics?ts=1&apikey=deee09649e76da698be9309401af1ab5&hash=88aba53821d4be560f6d637dd1d5bbd4'
+        
+        const endPoint = 'http://gateway.marvel.com/v1/public/characters?limit=100&ts=1691389216&apikey=deee09649e76da698be9309401af1ab5&hash=31df0cb4cb6edcdb610ce8e2721dd832'
         
         return fetch(endPoint)
-        .then(data => data.json())
-        .then(data => console.log(data))
-        // .then(({ name, author, thumbnail }) => ({
-        //     thumbnail,
-        //     name
-        // }))
-deee09649e76da698be9309401af1ab5
+        .then(response => response.json())
+        .then(data => data.data.results)
+        .catch((err) => {
+            console.log('rejected ', err)
+        })
     }
 }
 export class Heores {
     constructor(root) {
 
         this.root = document.getElementById(root)
-
         this.container = document.querySelector('.character-container')
-
-        MarvelApi.search()
     }
 }
 
 export class HeroesView extends Heores {
     constructor(root) {
         super(root)
-    
-
-       this.update()
+        
+        this.update()
 
     }
-    entries = []
-    update() {
-        this.entries.forEach((user) => {
+    
+
+    async update() {
+
+        //get the response from marvel fetch class and assign to heroes variable
+        const heroes = await MarvelApi.search();
+
+        heroes.forEach((heroeItem) => {
             const heroe = this.createHeroe()
-            heroe.querySelector('.character img').src = user.thumbnail
-            heroe.querySelector('.character img').alt = user.name +' photo'
-            heroe.querySelector('.character p').textContent = user.author
-            heroe.querySelector('.character h3').textContent = user.name
+            heroe.querySelector('.character img').src = heroeItem.thumbnail.path+'/portrait_uncanny.'+heroeItem.thumbnail.extension
+            heroe.querySelector('.character img').alt = heroeItem.name +' photo'
+            heroe.querySelector('.character p').textContent = heroeItem.author
+            heroe.querySelector('.character h3').textContent = heroeItem.name
 
             this.container.append(heroe)
         })
