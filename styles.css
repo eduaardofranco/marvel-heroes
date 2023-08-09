@@ -125,6 +125,24 @@ header .logo svg {
 .character h3 {
     font-size: 2.5rem;
 }
+.load-more {
+    display: block;
+    margin: 3rem 0;
+    text-align: center;
+}
+.load-more a {
+    background-color: var(--color-title-sec);
+    color: white;
+    display: inline-block;
+    padding: 1rem 3rem;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all ease .4s;
+}
+.load-more a:hover {
+    filter: brightness(80%)
+}
+
 footer {
     background-color: var(--color-title-sec);
     color: white;
