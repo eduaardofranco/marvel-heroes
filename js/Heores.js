@@ -24,11 +24,20 @@ export class HeroesView extends Heores {
     constructor(root) {
         super(root)
        
+        //set how many he
         this.itemsPerPage = 8
         this.currentPage = 1
+        this.heroes = []
+
+        //load the firsts heroes
+        this.loadMore()
 
         this.loadMoreButton = document.querySelector('.load-more a')
-        this.searchInput = document.getElementById('search')
+        this.searchInputText = document.getElementById('search')
+        this.searchNotFound = document.querySelector('.search-result')
+        this.searchNotFoundValue = document.querySelector('.search-result span')
+        this.searchButton = document.getElementById('search-input')
+
         
         // Use an arrow function to preserve the context
         this.loadMoreButton.addEventListener('click', (event) => {
@@ -37,32 +46,49 @@ export class HeroesView extends Heores {
         })
 
         //search input function
-        this.searchInput.addEventListener('keydown', (e) => {
-            const heroeSearch = e.target.value
-            this.search(heroeSearch)
+        this.searchButton.addEventListener('click', (e) => {
+            
+            const inputValue = this.searchInputText.value
+            //if input text is != empty shoe the search
+            if(inputValue != '') {
+                e.preventDefault()
+                this.search(inputValue)
+            }
 
         })
         
-        this.loadMore()
     }
+    async loadApi() {
+        //get the response from marvel fetch class and assign to heroes variable
+        return  this.heroes = await MarvelApi.search();
+    }
+    
     async search(heroeSearch) {
+        //assign the full away api to heroes variable loading the function loadApi()
+        const heroes = await this.loadApi()
 
         //clear the heroes on the screen every key typed on search
         this.container.innerHTML = ''
 
-        const heroes = await MarvelApi.search();
         // console.log(heroes)
 
         const  newHeroes = heroes.filter((heroe) => heroe.name.toLowerCase().includes(heroeSearch.toLowerCase()))
-        console.log(newHeroes)
-        this.update(newHeroes)
+        if(newHeroes == 0 ){
+            this.searchNotFound.style.display = 'block'
+            this.searchNotFoundValue.innerText = heroeSearch
+        }
+        else {
+            this.searchNotFound.style.display = 'none'
+            this.update(newHeroes)
+        }
+        this.loadMoreButton.style.display = 'none'
 
     }
 
     async loadMore() {
         
-        //get the response from marvel fetch class and assign to heroes variable
-        const heroes = await MarvelApi.search();
+        //assign the full away api to heroes variable loading the function loadApi()
+        const heroes = await this.loadApi()
 
         //set the start and end of slice function
         const startIndex = (this.currentPage - 1) * this.itemsPerPage;

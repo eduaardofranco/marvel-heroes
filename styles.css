@@ -76,7 +76,7 @@ header .logo svg {
     display: flex;
     flex-wrap: wrap;
     gap: 3rem;
-    justify-content: space-between;
+    /* justify-content: space-between; */
 }
 .character {
     border-radius: 2.5rem;
@@ -142,7 +142,16 @@ header .logo svg {
 .load-more a:hover {
     filter: brightness(80%)
 }
-
+.search-result {
+    display: none;
+    font-size: 2rem;
+    margin: 2rem 0;
+    text-align: center;
+    text-transform: uppercase;
+}
+.search-result span {
+    color: var(--color-title-sec);
+}
 footer {
     background-color: var(--color-title-sec);
     color: white;
