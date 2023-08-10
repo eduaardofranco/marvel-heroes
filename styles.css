@@ -112,7 +112,7 @@ header .logo svg {
 
     position: absolute;
     padding: 0 0 1rem 2rem;
-    bottom: 0;
+    bottom: 1.5rem;
     left: 0;
     width: 100%;
     transition: all .3s ease;
@@ -152,6 +152,59 @@ header .logo svg {
 .search-result span {
     color: var(--color-title-sec);
 }
+.heroe-stats-container {
+    background: rgba(0, 0, 0, .95);
+    position: fixed;
+    left: 0;
+    top: 0;
+    display: block;
+    width: 100%;
+}
+.heroe-stats-container .container {
+    background-color: ;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 5rem;
+    margin: 0 auto;
+    width: 120rem;
+    min-height: 100vh
+
+}
+.heroe-stats-container h2 {
+    font-size: 3rem;
+    text-transform: uppercase;
+}
+.heroe-stats-container .series p + p {
+    margin-top: 2rem;
+}
+.heroe-stats-container h4 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+.heroe-stats-container .description {
+    color: rgba(250, 250, 250, .7);
+    font-weight: 100;
+    margin: 2rem 0;
+}
+.heroe-stats-container .container img {
+    max-width: 46.4rem;
+}
+.heroe-stats-container .close svg {
+    cursor: pointer;
+    position: absolute;
+    right: 5rem;
+    top: 5rem;
+    width: 5rem;
+    color: white;
+}
+.heroe-stats-container .close svg path {
+    fill: white;
+}
+
+
 footer {
     background-color: var(--color-title-sec);
     color: white;
@@ -182,7 +235,27 @@ footer .socials a + a {
     margin-left: 2rem;
 }
 @media (max-width: 1200px) {
-    #app,header, footer .content {
+    #app,header, footer .content, .heroe-stats-container .container {
         width: 90%;
+    }
+}
+@media (max-width: 1000px) {
+    .heroe-stats-container .container img {
+        max-width: 30rem;
+    }
+}
+@media (max-width: 700px) {
+    .heroe-stats-container .close svg {
+        right: 1rem;
+        top: 1rem;
+        height: 3rem;
+        width: 3rem;
+    }
+    .heroe-stats-container .container {
+        display: block;
+    }
+    .heroe-stats-container .container img {
+        display: block;
+        margin: 5rem auto 5rem auto;
     }
 }

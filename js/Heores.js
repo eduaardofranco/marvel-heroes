@@ -6,7 +6,16 @@ export class MarvelApi {
         
         return fetch(endPoint)
         .then(response => response.json())
-        .then(data => data.data.results)
+        .then(res => res.data.results)
+        .then(results => {
+            // Assuming results is an array containing objects
+            return results.map(({ id, name, description, thumbnail }) => ({
+              id,
+              name,
+              description,
+              thumbnail
+            }));
+          })
         .catch((err) => {
             console.log('rejected ', err)
         })
@@ -45,25 +54,34 @@ export class HeroesView extends Heores {
             this.loadMore(); // Now "this" refers to the instance of HeroesView
         })
 
-        //search input function
-        this.searchButton.addEventListener('click', (e) => {
-            
-            const inputValue = this.searchInputText.value
-            //if input text is != empty shoe the search
-            if(inputValue != '') {
-                e.preventDefault()
-                this.search(inputValue)
-            }
 
-        })
+        const debouncedSearch = this.deBounce((inputValue) => {
+            this.search(inputValue);
+        });
+
+        //search input function
+        this.searchInputText.addEventListener('input', (event) => {
+            const inputValue = event.target.value;
+            debouncedSearch(inputValue); // Call the debounced function with the input value
+          });
         
     }
     async loadApi() {
         //get the response from marvel fetch class and assign to heroes variable
         return  this.heroes = await MarvelApi.search();
     }
+    deBounce(func, timeout = 300) {
+        let timer;
+        return (...args) => {
+            clearTimeout(timer)
+            timer = setTimeout(() => {
+                func.apply(this, args)
+            }, timeout)
+        }
+    }
     
-    async search(heroeSearch) {
+    async search(inputValue) {
+
         //assign the full away api to heroes variable loading the function loadApi()
         const heroes = await this.loadApi()
 
@@ -72,14 +90,15 @@ export class HeroesView extends Heores {
 
         // console.log(heroes)
 
-        const  newHeroes = heroes.filter((heroe) => heroe.name.toLowerCase().includes(heroeSearch.toLowerCase()))
+        const  newHeroes = heroes.filter((heroe) => heroe.name.toLowerCase().includes(inputValue.toLowerCase()))
         if(newHeroes == 0 ){
             this.searchNotFound.style.display = 'block'
-            this.searchNotFoundValue.innerText = heroeSearch
+            this.searchNotFoundValue.innerText = inputValue
         }
         else {
             this.searchNotFound.style.display = 'none'
             this.update(newHeroes)
+            console.log('atualizou tela')
         }
         this.loadMoreButton.style.display = 'none'
 
@@ -110,12 +129,11 @@ export class HeroesView extends Heores {
     
 
     update(heroesToDisplay) {
-
+        // console.log(heroesToDisplay)
         heroesToDisplay.forEach((heroeItem) => {
             const heroe = this.createHeroe()
             heroe.querySelector('.character img').src = heroeItem.thumbnail.path+'/portrait_uncanny.'+heroeItem.thumbnail.extension
             heroe.querySelector('.character img').alt = heroeItem.name +' photo'
-            heroe.querySelector('.character p').textContent = heroeItem.author
             heroe.querySelector('.character h3').textContent = heroeItem.name
 
             this.container.append(heroe)
