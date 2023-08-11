@@ -193,11 +193,17 @@ header .logo svg {
 .heroe-stats-container .container img {
     max-width: 46.4rem;
 }
-.heroe-stats-container .close svg {
+.heroe-stats-container .close {
     cursor: pointer;
     position: absolute;
     right: 5rem;
     top: 5rem;
+    display: block;
+    height: 5rem;
+    width: 5rem;
+}
+.heroe-stats-container .close svg {
+    pointer-events: none;
     width: 5rem;
     color: white;
 }
