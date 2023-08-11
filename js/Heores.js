@@ -33,7 +33,7 @@ export class HeroesView extends Heores {
     constructor(root) {
         super(root)
        
-        //set how many he
+        //set how many heroes per load()
         this.itemsPerPage = 8
         this.currentPage = 1
         this.heroes = []
@@ -41,7 +41,7 @@ export class HeroesView extends Heores {
         //load the firsts heroes
         this.loadMore()
 
-        this.loadMoreButton = document.querySelector('.load-more a')
+        this.loadMoreButton = document.querySelector('.load-more')
         this.searchInputText = document.getElementById('search')
         this.searchNotFound = document.querySelector('.search-result')
         this.searchNotFoundValue = document.querySelector('.search-result span')
@@ -54,15 +54,15 @@ export class HeroesView extends Heores {
             this.loadMore(); // Now "this" refers to the instance of HeroesView
         })
 
-
+        //assign the debounce fnc to a variable
         const debouncedSearch = this.deBounce((inputValue) => {
             this.search(inputValue);
         });
 
-        //search input function
+        //search input field action
         this.searchInputText.addEventListener('input', (event) => {
             const inputValue = event.target.value;
-            debouncedSearch(inputValue); // Call the debounced function with the input value
+            debouncedSearch(inputValue); // Call the debounced function and pass the input value
           });
         
     }
@@ -70,6 +70,8 @@ export class HeroesView extends Heores {
         //get the response from marvel fetch class and assign to heroes variable
         return  this.heroes = await MarvelApi.search();
     }
+
+    //deBounce function
     deBounce(func, timeout = 300) {
         let timer;
         return (...args) => {
@@ -81,26 +83,35 @@ export class HeroesView extends Heores {
     }
     
     async search(inputValue) {
+        console.log(inputValue)
 
-        //assign the full away api to heroes variable loading the function loadApi()
+        //assign the loadApi to heroes variable
         const heroes = await this.loadApi()
 
-        //clear the heroes on the screen every key typed on search
+        //clear the heroes on the screen every key(with debounce) typed on search
         this.container.innerHTML = ''
 
-        // console.log(heroes)
-
+        // if search is empty load 8 heroes and show loadmore button
+        if(inputValue == '') {
+            this.searchNotFound.style.display = 'none'
+            this.loadMore()
+            this.currentPage = 1
+            this.loadMoreButton.style.display = 'block'
+        }
+        //filter the array with the value passed on search input
         const  newHeroes = heroes.filter((heroe) => heroe.name.toLowerCase().includes(inputValue.toLowerCase()))
-        if(newHeroes == 0 ){
+
+        //if filter returns no heroes show message not found
+        if(newHeroes.length == 0 ){
             this.searchNotFound.style.display = 'block'
             this.searchNotFoundValue.innerText = inputValue
+            this.loadMoreButton.style.display = 'none'
         }
-        else {
+        //if the filter returns smt hide not found message and display the heroes on the screen
+        if(newHeroes.length !== 0 && inputValue !== '') {
             this.searchNotFound.style.display = 'none'
             this.update(newHeroes)
-            console.log('atualizou tela')
         }
-        this.loadMoreButton.style.display = 'none'
 
     }
 
@@ -129,7 +140,7 @@ export class HeroesView extends Heores {
     
 
     update(heroesToDisplay) {
-        // console.log(heroesToDisplay)
+
         heroesToDisplay.forEach((heroeItem) => {
             const heroe = this.createHeroe()
             heroe.querySelector('.character img').src = heroeItem.thumbnail.path+'/portrait_uncanny.'+heroeItem.thumbnail.extension

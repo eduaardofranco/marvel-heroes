@@ -58,6 +58,7 @@ header .logo svg {
 }
 #app {
     margin: 0 auto;
+    min-height: 100vh;
     width: 120rem;
 }
 .headline {
