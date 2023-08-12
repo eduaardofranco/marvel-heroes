@@ -1,8 +1,7 @@
 export class MarvelApi {
-    static search() {
+    static search(itemsPerPage) {
         
-        const endPoint = 'http://gateway.marvel.com/v1/public/characters?limit=100&ts=1691389216&apikey=deee09649e76da698be9309401af1ab5&hash=31df0cb4cb6edcdb610ce8e2721dd832'
-        // const endPoint = 'https://www.superheroapi.com/api.php/6536724586393711'
+        const endPoint = `http://gateway.marvel.com/v1/public/characters?limit=${itemsPerPage}&ts=1691389216&apikey=deee09649e76da698be9309401af1ab5&hash=31df0cb4cb6edcdb610ce8e2721dd832`
         
         return fetch(endPoint)
         .then(response => response.json())
@@ -36,8 +35,11 @@ export class HeroesView extends Heores {
         super(root)
        
         //set how many heroes per load()
-        this.itemsPerPage = 8
+        this.itemsPerPage = 20
         this.currentPage = 1
+        this.itemsToLoad = this.itemsPerPage
+        this.itemsToLoadLimit = 100
+        
         this.heroes = []
 
         //load the firsts heroes
@@ -52,14 +54,15 @@ export class HeroesView extends Heores {
         this.closeModal = document.querySelector('.heroe-stats-container .close-modal')
         this.characterModal = document.querySelector('.character-modal')
 
-
+        //open heroe modal
         //event delegation
         //attach the addeventlistener to the parent and when the character html is created add to him
         this.container.addEventListener('click', (event)=> {
             event.preventDefault()
             const heroCard = event.target.closest('.character a').dataset.id
             this.updateHeroeDetails(heroCard)
-            // console.log(heroCard)
+            // document.querySelector('body').style.opacity = '0'
+            
         })
         
         // Use an arrow function to preserve the context
@@ -88,8 +91,12 @@ export class HeroesView extends Heores {
         })
     }
     async loadApi() {
+
+        return  this.heroes = await MarvelApi.search(this.itemsToLoad)
+
+        // console.log(this.itemsPerPage)
         //get the response from marvel fetch class and assign to heroes variable
-        return  this.heroes = await MarvelApi.search();
+        
     }
 
     //deBounce function
@@ -107,7 +114,7 @@ export class HeroesView extends Heores {
         console.log(inputValue)
 
         //assign the loadApi to heroes variable
-        const heroes = await this.loadApi()
+        const heroes = await this.loadApi(this.itemsPerPage)
 
         //clear the heroes on the screen every key(with debounce) typed on search
         this.container.innerHTML = ''
@@ -126,7 +133,7 @@ export class HeroesView extends Heores {
         if(newHeroes.length == 0 ){
             this.searchNotFound.style.display = 'block'
             this.searchNotFoundValue.innerText = inputValue
-            this.loadMoreButton.style.display = 'none'
+            // this.loadMoreButton.style.display = 'none'
         }
         //if the filter returns smt hide not found message and display the heroes on the screen
         if(newHeroes.length !== 0 && inputValue !== '') {
@@ -137,25 +144,34 @@ export class HeroesView extends Heores {
     }
 
     async loadMore() {
+
+        // if itemsToLoad is smaller than the api limit response increment itemsToLoad
+        if( this.itemsToLoad < this.itemsToLoadLimit) {
+            this.itemsToLoad += this.itemsPerPage
+            //assign result of fetch to heroes variable loading the function loadApi()
+            this.heroes = await this.loadApi()
         
-        //assign the full away api to heroes variable loading the function loadApi()
-        const heroes = await this.loadApi()
+        //otherwise itemsToLoad will be the max lengtg of the api response 
+        } else {
+            this.itemsToLoad = this.itemsToLoadLimit
+            // Hide the "Load More" button if no more items to display
+            this.loadMoreButton.style.display = 'none';
+
+        }
+        
 
         //set the start and end of slice function
         const startIndex = (this.currentPage - 1) * this.itemsPerPage;
         const endIndex = startIndex + this.itemsPerPage;
 
         
-        const heroesToDisplay = heroes.slice(startIndex, endIndex);
+        const heroesToDisplay = this.heroes.slice(startIndex, endIndex);
+
         //call uptdate with next 4 items i want to display
         this.update(heroesToDisplay);
         
         this.currentPage++; // Increment the page number
         
-        // Hide the "Load More" button if no more items to display
-        if (endIndex >= heroes.length) {
-            this.loadMoreButton.style.display = 'none';
-        }
 
     }
     
