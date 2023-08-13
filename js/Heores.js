@@ -35,10 +35,10 @@ export class HeroesView extends Heores {
         super(root)
        
         //set how many heroes per load()
-        this.itemsPerPage = 20
+        this.itemsPerPage = 8
         this.currentPage = 1
         this.itemsToLoad = this.itemsPerPage
-        this.itemsToLoadLimit = 100
+        this.itemsToLoadLimit = 21
         
         this.heroes = []
 
@@ -46,7 +46,7 @@ export class HeroesView extends Heores {
         this.loadMore()
 
         this.character = document.querySelector('.character a')
-        this.loadMoreButton = document.querySelector('.load-more')
+        this.loadMoreButton = document.querySelector('.load-more button')
         this.searchInputText = document.getElementById('search')
         this.searchNotFound = document.querySelector('.search-result')
         this.searchNotFoundValue = document.querySelector('.search-result span')
@@ -59,16 +59,27 @@ export class HeroesView extends Heores {
         //attach the addeventlistener to the parent and when the character html is created add to him
         this.container.addEventListener('click', (event)=> {
             event.preventDefault()
-            const heroCard = event.target.closest('.character a').dataset.id
-            this.updateHeroeDetails(heroCard)
-            // document.querySelector('body').style.opacity = '0'
+
+            //if heroe div click open heroe modal details
+            //prevent from clicking outside heroe div and throwing error
+            if(event.target !== this.container) {
+                const heroeCard = event.target.closest('.character a').dataset.id
+                this.updateHeroeDetails(heroeCard)
+            }
             
         })
         
         // Use an arrow function to preserve the context
-        this.loadMoreButton.addEventListener('click', (event) => {
+        this.loadMoreButton.addEventListener('click', async (event) => {
             event.preventDefault()
-            this.loadMore(); // Now "this" refers to the instance of HeroesView
+
+            //disable the button till the async loadMore() is completed
+            this.loadMoreButton.disabled = true;
+
+            await this.loadMore(); // Now "this" refers to the instance of HeroesView
+
+            this.loadMoreButton.disabled = false;
+
         })
 
         //assign the debounce fnc to a variable
@@ -90,12 +101,9 @@ export class HeroesView extends Heores {
             }
         })
     }
-    async loadApi() {
+    async callApi() {
 
         return  this.heroes = await MarvelApi.search(this.itemsToLoad)
-
-        // console.log(this.itemsPerPage)
-        //get the response from marvel fetch class and assign to heroes variable
         
     }
 
@@ -114,7 +122,7 @@ export class HeroesView extends Heores {
         console.log(inputValue)
 
         //assign the loadApi to heroes variable
-        const heroes = await this.loadApi(this.itemsPerPage)
+        const heroes = await this.callApi(this.itemsToLoadLimit)
 
         //clear the heroes on the screen every key(with debounce) typed on search
         this.container.innerHTML = ''
@@ -133,7 +141,7 @@ export class HeroesView extends Heores {
         if(newHeroes.length == 0 ){
             this.searchNotFound.style.display = 'block'
             this.searchNotFoundValue.innerText = inputValue
-            // this.loadMoreButton.style.display = 'none'
+            this.loadMoreButton.style.display = 'none'
         }
         //if the filter returns smt hide not found message and display the heroes on the screen
         if(newHeroes.length !== 0 && inputValue !== '') {
@@ -146,18 +154,13 @@ export class HeroesView extends Heores {
     async loadMore() {
 
         // if itemsToLoad is smaller than the api limit response increment itemsToLoad
-        if( this.itemsToLoad < this.itemsToLoadLimit) {
-            this.itemsToLoad += this.itemsPerPage
-            //assign result of fetch to heroes variable loading the function loadApi()
-            this.heroes = await this.loadApi()
-        
-        //otherwise itemsToLoad will be the max lengtg of the api response 
-        } else {
+        const isBigger = this.itemsToLoad >= this.itemsToLoadLimit
+        if(isBigger) {
             this.itemsToLoad = this.itemsToLoadLimit
             // Hide the "Load More" button if no more items to display
             this.loadMoreButton.style.display = 'none';
-
-        }
+        }    
+        this.heroes = await this.callApi()
         
 
         //set the start and end of slice function
@@ -171,7 +174,11 @@ export class HeroesView extends Heores {
         this.update(heroesToDisplay);
         
         this.currentPage++; // Increment the page number
-        
+
+        if( this.itemsToLoad < this.itemsToLoadLimit) this.itemsToLoad += this.itemsPerPage
+
+
+
 
     }
     
@@ -200,7 +207,7 @@ export class HeroesView extends Heores {
 
         character.innerHTML = 
         `
-            <a href="" data-set="">
+            <a href="" data-id="">
                 <figure>
                     <img src="" alt="">
                 </figure>
@@ -216,9 +223,8 @@ export class HeroesView extends Heores {
 
     async updateHeroeDetails(heroeId) {
 
-            const heroes = await this.loadApi()
+            const heroes = await this.callApi()
             const heroDetail = heroes.find((heroe) => heroe.id == heroeId)
-            console.log(heroDetail)
 
             const heroe = this.createHeroDetail()
             heroe.querySelector('.heroe-stats-container h2').innerText = heroDetail.name

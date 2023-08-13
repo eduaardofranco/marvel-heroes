@@ -131,16 +131,18 @@ header .logo svg {
     margin: 3rem 0;
     text-align: center;
 }
-.load-more a {
+.load-more button {
     background-color: var(--color-title-sec);
+    border: none;
     color: white;
+    cursor: pointer;
     display: inline-block;
     padding: 1rem 3rem;
     text-transform: uppercase;
     text-decoration: none;
     transition: all ease .4s;
 }
-.load-more a:hover {
+.load-more button:hover {
     filter: brightness(80%)
 }
 .search-result {
